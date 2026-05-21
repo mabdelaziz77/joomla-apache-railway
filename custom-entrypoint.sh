@@ -2,16 +2,19 @@
 set -e
 
 # Background daemon: Bypasses the Joomla remote database ownership check
-# Monitors the installation folder and automatically deletes the generated token file.
 (
   while true; do
+    # If the installation directory exists, watch for the ownership file and delete it
     if [ -d "/var/www/html/installation" ]; then
       find /var/www/html/installation/ -maxdepth 1 -name "_Joomla_*.txt" -type f -delete 2>/dev/null
-    else
-      # Exit the loop once the installation directory is deleted post-install
+    fi
+
+    # Stop the daemon once Joomla is fully installed
+    if [ -f "/var/www/html/configuration.php" ]; then
       break
     fi
-    sleep 2
+    
+    sleep 1
   done
 ) &
 
